@@ -1,3 +1,8 @@
+#Visual Studio Debug files
+*.log
+Debug/
+biyesheji1/Debug/
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db

@@ -9,8 +9,12 @@ static GLfloat xspin = 0.0;
 static GLfloat yspin = 0.0;
 double lastx=0.0,lasty=0.0;
 int ithpath=0;
+int end;
+int t;
+int map;
+bool initflag=true;
 
-const GLfloat R = 0.1;  
+const GLfloat R = 0.25;  
 const GLfloat Pi = 3.1415926536f;  
 
 
@@ -19,26 +23,40 @@ void init(void){
      glShadeModel(GL_FLAT);
 }
 
-void display( ){
+void display(){
+		 double tempx,tempy;
+	tempx=(double)xy[s].x;
+	  tempy=(double)xy[s].y;
      glClear(GL_COLOR_BUFFER_BIT);
      glPushMatrix();
-	 glTranslatef(xspin,yspin,0.0);
-     glColor3f(1.0,1.0,1.0);
-	 glRectf(-0.3,-0.3,0.3,0.3);
-   /*  glBegin(GL_POLYGON);
+	 if(initflag){
+		 glTranslatef(xspin,yspin,0.0);
+		initflag=false;}
+	 else
+	 glTranslatef(xspin-(double)xy[s].x,yspin-(double)xy[s].y,0.0);
+     glColor3f(0.0,0.0,1.0);
+	// glRectf(tempx-0.3,tempy-0.3,tempx+0.3,tempy+0.3);
+     glBegin(GL_POLYGON);
         
     for(int i=0; i<100; ++i)  
-        glVertex2f(R*cos(2*Pi/n*i), R*sin(2*Pi/n*i));  
+        glVertex2f(R*cos(2*Pi/100*i)+tempx, R*sin(2*Pi/100*i)+tempy);  
 	glEnd();   
 
-	*/
+	
      glPopMatrix();
 	        glColor3f(1.0,0.0,0.0);
 	  for(int i=0;i<ob_num;i++){
 		double ob_x=xy[obid[i]].x;
 		double ob_y=xy[obid[i]].y;
-		 glRectf(ob_x-0.3,ob_y-0.3,ob_x+0.3,ob_y+0.3);
+	 glBegin(GL_POLYGON);
+    for(int i=0; i<100; ++i)  
+        glVertex2f(R*cos(2*Pi/100*i)+ob_x, R*sin(2*Pi/100*i)+ob_y);  
+	glEnd();   
 	 }
+	  glColor3f(0.0,1.0,0.0);
+	  tempx=(double)xy[t].x;
+	  tempy=(double)xy[t].y;
+	  glRectf(tempx-0.3,tempy-0.3,tempx+0.3,tempy+0.3);
      glutSwapBuffers();
 
 }
@@ -56,10 +74,6 @@ void moveDisplay(void){
 	lastx = xtemp;
 	lasty = ytemp;
 	
-     if(yspin > 100.0)
-          yspin = yspin -100.0;
-	 if(xspin > 100.0)
-          xspin = xspin -100.0;
 	 Sleep(500);
      glutPostRedisplay();
 }
@@ -68,7 +82,8 @@ void reshape(int w,int h){
      glViewport(0,0,(GLsizei)w,(GLsizei)h);
      glMatrixMode(GL_PROJECTION);
      glLoadIdentity();
-     glOrtho(0.0,10.0,0.0,10.0,-1.0,1.0);
+	 double mapd=(double)map;
+     glOrtho(0.0,mapd,0.0,mapd,-1.0,1.0);
      glMatrixMode(GL_MODELVIEW);
      glLoadIdentity();
 }
@@ -91,18 +106,22 @@ void mouse(int button,int state,int x,int y){
 
  int main(int argc, char  **argv)
 {
-
+	int end;
 	//-----------
-		int end;
+	printf("请输入地图规模n 规模为n*n:\n");
+	scanf("%d",&map);
+	//map=10;
 	printf("请输入起点和终点编号:\n");
 	scanf("%d%d",&s,&end);
+	t=end;
 	fill(G[0],G[0]+MAXV*MAXV,INF);
-	init(10);	
-	obstacle(10);
-	Dikstra(s);
+	init(map);	
+	obstacle(map,end);
+	Dikstra(s,map*map);
 	DFS(s,end);
 	for(int i=0;i<path_num;i++)
 		printf("%d\n",path[i]);
+
 	//----------
      glutInit(&argc,argv);
      glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
@@ -117,6 +136,6 @@ void mouse(int button,int state,int x,int y){
 
      glutMainLoop();
 
-
+	while(1);
      return 0;
 }

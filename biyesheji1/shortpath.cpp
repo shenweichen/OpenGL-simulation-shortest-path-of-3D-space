@@ -3,63 +3,56 @@
 #include<algorithm>
 #include<time.h>
 using namespace std;
-
 int n=100;
 int m,s,G[MAXV][MAXV],MAP[MAXV][MAXV];//存储坐标系每个点的编号
 double  d[MAXV];
-int pre[MAXV];
+int pre[MAXEDGE];
 bool vis[MAXV] = {false};
-int path[10000],path_num=0,ob_num=0;
-xys xy[100];
+int path[MAXEDGE],path_num=0,ob_num=0;
+xys xy[MAXV];
 int obid[1000];
 
 
-void init(int span){
+void init(int map){
 		int num=0;
-	for(int i=0;i<span;i++){//初始化顶点编号
-		for(int j=0;j<span;j++){
+	for(int i=0;i<map;i++){//初始化顶点编号
+		for(int j=0;j<map;j++){
 			xy[num].x=i;
 			xy[num].y=j;
 			MAP[i][j]=num++;
 		}
 	}
 
-		for(int i=0;i<span;i++){
+		for(int i=0;i<map;i++){
 
-			for(int j=0;j<span;j++){
-
+			for(int j=0;j<map;j++){
+					int s = MAP[i][j];
 				if(i==0){
 					if(j==0){
-						int s = MAP[i][j];
 						G[s][MAP[i+1][j]]=1;
 						G[s][MAP[i][j+1]]=1;
 						G[s][MAP[i+1][j+1]]=1.414;
-					}else if (j==span-1){
-						int s = MAP[i][j];
+					}else if (j==map-1){
 						G[s][MAP[i+1][j]]=1;
 						G[s][MAP[i][j-1]]=1;
 						G[s][MAP[i+1][j-1]]=1.414;
 					}else{
-						int s = MAP[i][j];
 						G[s][MAP[i+1][j]]=1;
 						G[s][MAP[i][j-1]]=1;
 						G[s][MAP[i][j+1]]=1;
 						G[s][MAP[i+1][j-1]]=1.414;
 						G[s][MAP[i+1][j+1]]=1.414;
 					}
-				}else if(i==span-1){
+				}else if(i==map-1){
 					if(j==0){
-						int s = MAP[i][j];
 						G[s][MAP[i-1][j]]=1;
 						G[s][MAP[i][j+1]]=1;
 						G[s][MAP[i-1][j+1]]=1.414;
-					}else if (j==span-1){
-						int s = MAP[i][j];
+					}else if (j==map-1){
 						G[s][MAP[i-1][j]]=1;
 						G[s][MAP[i][j-1]]=1;
 						G[s][MAP[i-1][j-1]]=1.414;
 					}else{
-						int s = MAP[i][j];
 						G[s][MAP[i-1][j]]=1;
 						G[s][MAP[i][j-1]]=1;
 						G[s][MAP[i][j+1]]=1;
@@ -70,26 +63,23 @@ void init(int span){
 				}
 				else{
 					if(j==0){
-						int s = MAP[i][j];
 						G[s][MAP[i-1][j]]=1;
 						G[s][MAP[i+1][j]]=1;
 						G[s][MAP[i][j+1]]=1;
 							G[s][MAP[i-1][j+1]]=1.414;
 						G[s][MAP[i+1][j+1]]=1.414;
-					}else if (j==span-1){
-						int s = MAP[i][j];
+					}else if (j==map-1){
 						G[s][MAP[i-1][j]]=1;
 						G[s][MAP[i+1][j]]=1;
 						G[s][MAP[i][j-1]]=1;
 							G[s][MAP[i-1][j-1]]=1.414;
 						G[s][MAP[i+1][j-1]]=1.414;
 					}else{
-						int s = MAP[i][j];
 						G[s][MAP[i-1][j]]=1;
 						G[s][MAP[i+1][j]]=1;
 						G[s][MAP[i][j-1]]=1;
 						G[s][MAP[i][j+1]]=1;
-							G[s][MAP[i-1][j-1]]=1.414;
+						G[s][MAP[i-1][j-1]]=1.414;
 						G[s][MAP[i+1][j+1]]=1.414;
 						G[s][MAP[i-1][j+1]]=1.414;
 						G[s][MAP[i+1][j-1]]=1.414;
@@ -100,22 +90,24 @@ void init(int span){
 	}
 }
 
-void Dikstra(int s){
+void Dikstra(int s,int numofvertex){
 	fill(d,d+MAXV,INF);
-	for(int i=0;i<n;i++)
+	for(int i=0;i<MAXEDGE;i++)
 		pre[i]=i;
 	d[s]=0;
-	for(int i=0;i<n;i++){
+	for(int i=0;i<numofvertex;i++){
 		int u = -1,MIN = INF;
-		for(int j=0;j<n;j++){
+		for(int j=0;j<numofvertex;j++){
 			if(vis[j]==false&&d[j]<MIN){
 				u=j;
 				MIN=d[j];
 			}
 		}
-		if(u==-1)return;
+		if(u==-1){
+			printf("没有路径可以通过\n");
+			return;}
 		vis[u] = true;
-		for(int v =0;v<n;v++){
+		for(int v =0;v<numofvertex;v++){
 			if(vis[v] == false &&G[u][v]!=INF && d[u]+G[u][v]<d[v]){
 				d[v] = d[u] + G[u][v];
 				pre[v]=u;
@@ -133,51 +125,58 @@ void DFS(int s,int v){
 	path[path_num++]=v;
 }
 
-void obstacle(int span){
+void obstacle(int map,int end){
 
 	
-	printf("please input the num of obtacles:\n");
+	printf("请输入障碍物数量 obtacles:\n");
 	scanf("%d",&ob_num);
 	srand((unsigned)time(NULL));
+	int total_vertex=map*map;
 	for(int i=0;i<ob_num;i++){
-		printf("please input the id of obtacle:\n");
+		//printf("please input the id of obtacle:\n");
 		int temp;
-		
-		temp=rand()%100;
-		printf("%d\n",temp);
 		//scanf("%d",&temp);
+		temp=rand()%total_vertex;
+		if(temp==s||temp==end){
+			i--;
+			continue;
+		}
+		//printf("%d\n",temp);
+		
 		obid[i]=temp;
-	if(temp+span<n){//下边还有
-		G[temp][temp+span]=INF;
-			if(temp+span>0)//左下还有
-				G[temp][temp+span-1]=INF;
-			if(temp+span<n-1)//右下还有
-				G[temp][temp+span+1]=INF;
+	if(temp+map<total_vertex){//下边还有
+		G[temp][temp+map]=INF;
+			if(temp+map>0)//左下还有
+				G[temp][temp+map-1]=INF;
+			if(temp+map<total_vertex-1)//右下还有
+				G[temp][temp+map+1]=INF;
 	}
-	if(temp-span>=0){//上边还有
-		G[temp][temp-span]=INF;
-		if(temp-span>0)//左上还有
-				G[temp][temp-span-1]=INF;
-			if(temp-span<n-1)//右上还有
-				G[temp][temp-span+1]=INF;
+	if(temp-map>=0){//上边还有
+		G[temp][temp-map]=INF;
+		if(temp-map>0)//左上还有
+				G[temp][temp-map-1]=INF;
+			if(temp-map<n-1)//右上还有
+				G[temp][temp-map+1]=INF;
 
 	}
-	if(temp+1<n){//右边还有
+	if(temp+1<total_vertex){//右边还有
 		G[temp][temp+1]=INF;
-			if(temp-span<n-1)//右上还有
-				G[temp][temp-span+1]=INF;
-			if(temp+span<n-1)//右下还有
-				G[temp][temp+span+1]=INF;
+			if(temp-map<total_vertex-1)//右上还有
+				G[temp][temp-map+1]=INF;
+			if(temp+map<total_vertex-1)//右下还有
+				G[temp][temp+map+1]=INF;
 
 	}
 	if(temp-1>=0){//左边还有
 		G[temp][temp-1]=INF;
-			if(temp-span>0)//左上还有
-				G[temp][temp-span-1]=INF;
-			if(temp+span>0)//左下还有
-				G[temp][temp+span-1]=INF;
+			if(temp-map>0)//左上还有
+				G[temp][temp-map-1]=INF;
+			if(temp+map>0)//左下还有
+				G[temp][temp+map-1]=INF;
 
 	}
 
 }
 }
+
+
