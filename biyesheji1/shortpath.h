@@ -2,7 +2,7 @@
 const int MAXV=10000 ;
 const int MAXEDGE=8*MAXV;
 const double INF=1000000.0 ;
-extern int s,G[MAXV][MAXV];
+extern int G[MAXV][MAXV];
 extern double  d[MAXV];
 extern int pre[MAXEDGE];
 extern bool IsVisited[MAXV] ;
@@ -14,6 +14,6 @@ int x,y;
 extern int nObstacleID[1000];
 
 extern void init(int map);
-extern void Dikstra(int s,int numofvertex);
+extern void Dikstra(int s,int nVertexNum);
 extern void DFS(int s,int v);
-extern void obstacle(int span,int end);
+extern void Obstacle(int span,int s,int end);

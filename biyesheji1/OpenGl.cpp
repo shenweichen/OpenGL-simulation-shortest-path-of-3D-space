@@ -23,17 +23,16 @@ void init(void){
 
 void display(){
 		 double tempx,tempy;
-	tempx=(double)xy[s].x;
-	  tempy=(double)xy[s].y;
+	tempx=(double)xy[nStartPoint].x;
+	  tempy=(double)xy[nStartPoint].y;
      glClear(GL_COLOR_BUFFER_BIT);
      glPushMatrix();
 	 if(initIsTrue){
 		 glTranslatef(xspin,yspin,0.0);
 		initIsTrue=false;}
 	 else
-	 glTranslatef(xspin-(double)xy[s].x,yspin-(double)xy[s].y,0.0);
+	 glTranslatef(xspin-(double)xy[nStartPoint].x,yspin-(double)xy[nStartPoint].y,0.0);
      glColor3f(0.0,0.0,1.0);
-	 glRectf(tempx-0.3,tempy-0.3,tempx+0.3,tempy+0.3);//
      glBegin(GL_POLYGON);
         
     for(int i=0; i<100; ++i)  
@@ -67,10 +66,12 @@ void moveDisplay(void){
 		xtemp=(double)xy[nPath[ithpath]].x;
 		ytemp=(double)xy[nPath[ithpath++]].y;
 
-	xspin+=(xtemp-dLastX);
+		xspin=xtemp;
+		yspin=ytemp;
+/*	xspin+=(xtemp-dLastX);
     yspin+=(ytemp-dLastY);
 	dLastX = xtemp;
-	dLastY = ytemp;
+	dLastY = ytemp;*/
 	
 	 Sleep(500);
      glutPostRedisplay();
@@ -104,22 +105,20 @@ void mouse(int button,int state,int x,int y){
 
  int main(int argc, char  **argv)
 {
-	//int end;
-	//-----------
 	printf("请输入地图规模n 规模为n*n:\n");
 	scanf("%d",&nRange);
 	printf("请输入起点和终点编号:\n");
-	scanf("%d%d",&s,&nEndPoint);
-	//t=end;
+	scanf("%d %d",&nStartPoint,&nEndPoint);
+
 	fill(G[0],G[0]+MAXV*MAXV,INF);
 	init(nRange);	
-	obstacle(nRange,nEndPoint);
-	Dikstra(s,nRange*nRange);
-	DFS(s,nEndPoint);
+	Obstacle(nRange,nStartPoint,nEndPoint);
+	Dikstra(nStartPoint,nRange*nRange);
+	DFS(nStartPoint,nEndPoint);
 	for(int i=0;i<nPathNum;i++)
 		printf("%d\n",nPath[i]);
 
-	//----------
+	//--------------
      glutInit(&argc,argv);
      glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
      glutInitWindowSize(500,500);
@@ -129,7 +128,6 @@ void mouse(int button,int state,int x,int y){
      glutDisplayFunc(display);
      glutReshapeFunc(reshape);
      glutMouseFunc(mouse);
-
 
      glutMainLoop();
 

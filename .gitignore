@@ -5,6 +5,7 @@ biyesheji1/Debug/
 ipch/
 *.suo
 *.sdf
+*.opensdf
 
 # Windows image file caches
 Thumbs.db

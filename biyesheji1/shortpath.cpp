@@ -3,7 +3,7 @@
 #include<algorithm>
 #include<time.h>
 using namespace std;
-int s,G[MAXV][MAXV];
+int G[MAXV][MAXV];
 double  d[MAXV];
 int pre[MAXEDGE];
 bool IsVisited[MAXV] = {false};
@@ -91,14 +91,14 @@ void init(int nRange){
 	}
 }
 
-void Dikstra(int s,int numofvertex){
+void Dikstra(int s,int nVertexNum){
 	fill(d,d+MAXV,INF);
 	for(int i=0;i<MAXEDGE;i++)
 		pre[i]=i;
 	d[s]=0;
-	for(int i=0;i<numofvertex;i++){
+	for(int i=0;i<nVertexNum;i++){
 		int u = -1,MIN = INF;
-		for(int j=0;j<numofvertex;j++){
+		for(int j=0;j<nVertexNum;j++){
 			if(IsVisited[j]==false&&d[j]<MIN){
 				u=j;
 				MIN=d[j];
@@ -108,7 +108,7 @@ void Dikstra(int s,int numofvertex){
 			printf("没有路径可以通过\n");
 			return;}
 		IsVisited[u] = true;
-		for(int v =0;v<numofvertex;v++){
+		for(int v =0;v<nVertexNum;v++){
 			if(IsVisited[v] == false &&G[u][v]!=INF && d[u]+G[u][v]<d[v]){
 				d[v] = d[u] + G[u][v];
 				pre[v]=u;
@@ -126,7 +126,7 @@ void DFS(int s,int v){
 	nPath[nPathNum++]=v;
 }
 
-void obstacle(int nRange,int end){
+void Obstacle(int nRange,int s,int end){
 
 	
 	printf("请输入障碍物数量 obtacles:\n");
@@ -138,13 +138,14 @@ void obstacle(int nRange,int end){
 		int temp;
 		//scanf("%d",&temp);
 		temp=rand()%total_vertex;
-		if(temp==s||temp==end){
+		if(temp==s||temp==end){//如果生成的是起点或终点，跳过。
 			i--;
-			continue;
-		}
+			continue;}
+		else{
+		nObstacleID[i]=temp;
 		//printf("%d\n",temp);
 		
-		nObstacleID[i]=temp;
+		
 	if(temp+nRange<total_vertex){//下边还有
 		G[temp][temp+nRange]=INF;
 			if(temp+nRange>0)//左下还有
@@ -176,7 +177,7 @@ void obstacle(int nRange,int end){
 				G[temp][temp+nRange-1]=INF;
 
 	}
-
+		}
 }
 }
 
