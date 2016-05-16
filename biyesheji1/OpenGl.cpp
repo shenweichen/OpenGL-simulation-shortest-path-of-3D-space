@@ -1,25 +1,23 @@
 #include <GL/glut.h>
-#include <stdlib.h>
-#include<stdio.h>
+#include<cstdlib>
+#include<cstdio>
 #include<windows.h>
-#include "shortpath.h"
 #include<algorithm>
+#include "shortpath.h"
 using namespace std;
 static GLfloat xspin = 0.0;
 static GLfloat yspin = 0.0;
-double lastx=0.0,lasty=0.0;
+double dLastX=0.0,dLastY=0.0;
 int ithpath=0;
-int end;
-int t;
-int map;
-bool initflag=true;
+int nRange,nStartPoint,nEndPoint;
+bool initIsTrue=true;
 
-const GLfloat R = 0.25;  
+const GLfloat R = 0.28;  
 const GLfloat Pi = 3.1415926536f;  
 
 
 void init(void){
-     glClearColor(0.0,0.0,0.0,0.0);
+     glClearColor(1.0,1.0,1.0,0.0);
      glShadeModel(GL_FLAT);
 }
 
@@ -29,13 +27,13 @@ void display(){
 	  tempy=(double)xy[s].y;
      glClear(GL_COLOR_BUFFER_BIT);
      glPushMatrix();
-	 if(initflag){
+	 if(initIsTrue){
 		 glTranslatef(xspin,yspin,0.0);
-		initflag=false;}
+		initIsTrue=false;}
 	 else
 	 glTranslatef(xspin-(double)xy[s].x,yspin-(double)xy[s].y,0.0);
      glColor3f(0.0,0.0,1.0);
-	// glRectf(tempx-0.3,tempy-0.3,tempx+0.3,tempy+0.3);
+	 glRectf(tempx-0.3,tempy-0.3,tempx+0.3,tempy+0.3);//
      glBegin(GL_POLYGON);
         
     for(int i=0; i<100; ++i)  
@@ -44,18 +42,18 @@ void display(){
 
 	
      glPopMatrix();
-	        glColor3f(1.0,0.0,0.0);
-	  for(int i=0;i<ob_num;i++){
-		double ob_x=xy[obid[i]].x;
-		double ob_y=xy[obid[i]].y;
+	       glColor3f(1.0,0.0,0.0);
+	  for(int i=0;i<nObstacleNum;i++){
+		double ob_x=xy[nObstacleID[i]].x;
+		double ob_y=xy[nObstacleID[i]].y;
 	 glBegin(GL_POLYGON);
     for(int i=0; i<100; ++i)  
         glVertex2f(R*cos(2*Pi/100*i)+ob_x, R*sin(2*Pi/100*i)+ob_y);  
 	glEnd();   
 	 }
 	  glColor3f(0.0,1.0,0.0);
-	  tempx=(double)xy[t].x;
-	  tempy=(double)xy[t].y;
+	  tempx=(double)xy[nEndPoint].x;
+	  tempy=(double)xy[nEndPoint].y;
 	  glRectf(tempx-0.3,tempy-0.3,tempx+0.3,tempy+0.3);
      glutSwapBuffers();
 
@@ -66,13 +64,13 @@ void moveDisplay(void){
 		double xtemp,ytemp;
 		//printf("请输入移动的坐标\n");
 	//	scanf("%lf %lf",&xtemp,&ytemp);
-		xtemp=(double)xy[path[ithpath]].x;
-		ytemp=(double)xy[path[ithpath++]].y;
+		xtemp=(double)xy[nPath[ithpath]].x;
+		ytemp=(double)xy[nPath[ithpath++]].y;
 
-	xspin+=(xtemp-lastx);
-    yspin+=(ytemp-lasty);
-	lastx = xtemp;
-	lasty = ytemp;
+	xspin+=(xtemp-dLastX);
+    yspin+=(ytemp-dLastY);
+	dLastX = xtemp;
+	dLastY = ytemp;
 	
 	 Sleep(500);
      glutPostRedisplay();
@@ -82,10 +80,10 @@ void reshape(int w,int h){
      glViewport(0,0,(GLsizei)w,(GLsizei)h);
      glMatrixMode(GL_PROJECTION);
      glLoadIdentity();
-	 double mapd=(double)map;
-     glOrtho(0.0,mapd,0.0,mapd,-1.0,1.0);
+     glOrtho(0.0,(double)nRange,0.0,(double)nRange,-1.0,1.0);
      glMatrixMode(GL_MODELVIEW);
      glLoadIdentity();
+
 }
 
 void mouse(int button,int state,int x,int y){
@@ -106,21 +104,20 @@ void mouse(int button,int state,int x,int y){
 
  int main(int argc, char  **argv)
 {
-	int end;
+	//int end;
 	//-----------
 	printf("请输入地图规模n 规模为n*n:\n");
-	scanf("%d",&map);
-	//map=10;
+	scanf("%d",&nRange);
 	printf("请输入起点和终点编号:\n");
-	scanf("%d%d",&s,&end);
-	t=end;
+	scanf("%d%d",&s,&nEndPoint);
+	//t=end;
 	fill(G[0],G[0]+MAXV*MAXV,INF);
-	init(map);	
-	obstacle(map,end);
-	Dikstra(s,map*map);
-	DFS(s,end);
-	for(int i=0;i<path_num;i++)
-		printf("%d\n",path[i]);
+	init(nRange);	
+	obstacle(nRange,nEndPoint);
+	Dikstra(s,nRange*nRange);
+	DFS(s,nEndPoint);
+	for(int i=0;i<nPathNum;i++)
+		printf("%d\n",nPath[i]);
 
 	//----------
      glutInit(&argc,argv);
