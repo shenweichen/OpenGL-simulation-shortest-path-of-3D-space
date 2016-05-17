@@ -9,8 +9,9 @@ static GLfloat xspin = 0.0;
 static GLfloat yspin = 0.0;
 static GLfloat zspin = 0.0f;
 static GLfloat axis = 5.0f;//坐标轴半长度
-const GLfloat R = 0.4;  
+const GLfloat R = 0.5;  
 const GLfloat Pi = 3.1415926536f;  
+int strip = 10;
 GLfloat xRotAngle=0.0f;  //绕x轴旋转角度  
 GLfloat yRotAngle=0.0f;  //绕x轴旋转角度
 double dLastX=0.0,dLastY=0.0;
@@ -19,15 +20,38 @@ int nRange,nStartPoint,nEndPoint;
 bool initIsTrue=true;
 
 void init(void){
-     glClearColor(0.0,0.0,0.0,0.0);
-     glShadeModel(GL_FLAT);
+	
+	axis=(double)nRange/2;
+	GLfloat mat_specular[]={1.0,1.0,1.0,1.0};
+	GLfloat mat_shininess[]={50.0};
+	GLfloat light_position []={1.0,1.0,1.0,0.0};
+	GLfloat white_light[]={1.0,1.0,1.0,1.0};
+	GLfloat lmodel_ambient []={0.1,0.1,0.1,1.0};
+
+     glClearColor(1.0,1.0,1.0,0.0);
+     glShadeModel(GL_SMOOTH);
+	 glMaterialfv(GL_FRONT,GL_SPECULAR,mat_specular);
+	 glMaterialfv(GL_FRONT,GL_SHININESS,mat_shininess);
+	 glLightfv(GL_LIGHT0,GL_POSITION,light_position);
+	 glLightfv(GL_LIGHT0,GL_DIFFUSE,white_light);
+	 glLightfv(GL_LIGHT0,GL_SPECULAR,white_light);
+	 glLightModelfv(GL_LIGHT_MODEL_AMBIENT,lmodel_ambient);
+	 
+	 glColorMaterial(GL_FRONT,GL_DIFFUSE); //允许材质颜色
+	 glEnable(GL_COLOR_MATERIAL); 
+
+	 glEnable(GL_LIGHTING);
+	 glEnable(GL_LIGHT0);
+	 glEnable(GL_DEPTH_TEST);
+	 
+	 
 }
 
 void display(){
 		 double tempx,tempy;
 		tempx=(double)xy[nStartPoint].x;
 	  tempy=(double)xy[nStartPoint].y;
-     glClear(GL_COLOR_BUFFER_BIT);
+     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	 glPushMatrix();
 	 //坐标系绕x轴旋转xRotAngle  
     glRotatef(xRotAngle,1.0f,0.0f,0.0f);    
@@ -38,18 +62,20 @@ void display(){
     glHint(GL_POINT_SMOOTH,GL_NICEST);  
     glEnable(GL_LINE_SMOOTH);  
     glHint(GL_LINE_SMOOTH,GL_NICEST);  
-    glEnable(GL_POLYGON_SMOOTH);  
+    glEnable(GL_POLYGON_SMOOTH); 
     glHint(GL_POLYGON_SMOOTH,GL_NICEST); 
 
 	//白色绘制坐标系  
-    glColor3f(1.0f,1.0f,1.0f);  
+    glColor3f(0.0f,0.0f,1.0f);  
     glBegin(GL_LINES);  
+		glDisable(GL_COLOR_MATERIAL); 
         glVertex3f(-axis,0.0f,0.0f);  
         glVertex3f(axis,0.0f,0.0f);  
         glVertex3f(0.0f,-axis,0.0f);  
         glVertex3f(0.0f,axis,0.0f);  
         glVertex3f(0.0f,0.0f,-axis);  
         glVertex3f(0.0f,0.0f,axis);  
+		 glEnable(GL_COLOR_MATERIAL); 
     glEnd();  
 
 
@@ -62,19 +88,19 @@ void display(){
 	 else;
 	 glTranslatef(xspin-(double)xy[nStartPoint].x,yspin-(double)xy[nStartPoint].y,0);
     
-	 glColor3f(0.0,0.0,1.0);		
+	 glColor3f(0.0,1.0,1.0);		
 	 glTranslatef(tempx-axis,tempy-axis,zspin);
-	 glutWireSphere(R,10,10);
+	 glutSolidSphere(R,strip,strip);
      glPopMatrix();
 
-	  glColor3f(1.0,0.0,0.0);
+	  glColor3f(1.0,0.0,1.0);
 	  for(int i=0;i<nObstacleNum;i++){
 		double ob_x=xy[nObstacleID[i]].x;
 		double ob_y=xy[nObstacleID[i]].y;			
 		//-----------------
 		   glPushMatrix();
 		  glTranslatef(ob_x-axis,ob_y-axis,zspin);
-		 glutWireSphere(R,10,10);
+		 glutSolidSphere(R,strip,strip);
 		 glPopMatrix();
 		 //-------------------
 	 }
@@ -87,12 +113,15 @@ void display(){
 	     glPushMatrix();
 		
 		  glTranslatef(tempx-axis,tempy-axis,zspin);
-		 glutSolidSphere(R,15,15);
+		 glutSolidSphere(R,strip,strip);
 		 glPopMatrix();
 
-	
+	glDisable(GL_COLOR_MATERIAL); 
+
 	  glutWireCube(axis*2);
+	   glEnable(GL_COLOR_MATERIAL); 
 	  	glPopMatrix();  
+		glFlush();
      glutSwapBuffers();
 
 }
@@ -179,12 +208,12 @@ void specialKey(int key,int x,int y){//按键输入处理函数
  int main(int argc, char  **argv)
 {
 	printf("请输入地图规模n 规模为n*n:\n");
-	//scanf("%d",&nRange);
-	nRange=10;
+	scanf("%d",&nRange);
+	//nRange=10;
 	printf("请输入起点和终点编号:\n");
-	//scanf("%d %d",&nStartPoint,&nEndPoint);
-	nStartPoint=0;
-	nEndPoint=99;
+	scanf("%d %d",&nStartPoint,&nEndPoint);
+	//nStartPoint=0;
+	//nEndPoint=99;
 	fill(G[0],G[0]+MAXV*MAXV,INF);
 	init(nRange);	
 	Obstacle(nRange,nStartPoint,nEndPoint);
