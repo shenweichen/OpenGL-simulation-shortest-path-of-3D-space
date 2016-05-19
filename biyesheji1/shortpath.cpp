@@ -3,10 +3,9 @@
 #include<algorithm>
 #include<time.h>
 using namespace std;
-int G[MAXV][MAXV];
-double  d[MAXV];
+double G[MAXV][MAXV],d[MAXV];
 int pre[MAXEDGE];
-bool IsVisited[MAXV] = {false};
+bool IsVisited[MAXV] = {false},flag=true;
 int nPath[MAXEDGE],nPathNum=0,nObstacleNum=0;
 COORDINATE xy[MAXV];
 int nObstacleID[1000];
@@ -24,7 +23,6 @@ void init(int nRange){
 			xy[num].y=j;
 		}
 	}
-
 		for(int i=0;i<nRange;i++){
 			for(int j=0;j<nRange;j++){
 					int s = Hash(i,j,nRange);	
@@ -60,20 +58,19 @@ void init(int nRange){
 						G[s][s-nRange-1]=1.414;
 						G[s][s-nRange+1]=1.414;
 					}
-
 				}
 				else{
 					if(j==0){
 						G[s][s-nRange]=1;
 						G[s][s+nRange]=1;
 						G[s][s+1]=1;
-							G[s][s-nRange+1]=1.414;
+						G[s][s-nRange+1]=1.414;
 						G[s][s+nRange+1]=1.414;
 					}else if (j==nRange-1){
 						G[s][s-nRange]=1;
 						G[s][s+nRange]=1;
 						G[s][s-1]=1;
-							G[s][s-nRange-1]=1.414;
+						G[s][s-nRange-1]=1.414;
 						G[s][s+nRange-1]=1.414;
 					}else{
 						G[s][s-nRange]=1;
@@ -86,7 +83,6 @@ void init(int nRange){
 						G[s][s+nRange-1]=1.414;
 					}
 				}
-
 			}
 	}
 }
@@ -97,7 +93,8 @@ void Dikstra(int s,int nVertexNum){
 		pre[i]=i;
 	d[s]=0;
 	for(int i=0;i<nVertexNum;i++){
-		int u = -1,MIN = INF;
+		int u = -1;
+		double MIN=INF;
 		for(int j=0;j<nVertexNum;j++){
 			if(IsVisited[j]==false&&d[j]<MIN){
 				u=j;
@@ -106,6 +103,7 @@ void Dikstra(int s,int nVertexNum){
 		}
 		if(u==-1){
 			printf("没有路径可以通过\n");
+			flag = false;
 			return;}
 		IsVisited[u] = true;
 		for(int v =0;v<nVertexNum;v++){
@@ -129,8 +127,12 @@ void DFS(int s,int v){
 void Obstacle(int nRange,int s,int end){
 
 	
-	printf("请输入障碍物数量 obtacles:\n");
+	printf("请输入障碍物数量0~%d:\n",nRange*nRange);
 	scanf("%d",&nObstacleNum);
+	while(nObstacleNum>=nRange*nRange||nObstacleNum<0){
+	printf("错误请重新输入障碍物数量0~%d:\n",nRange*nRange);
+		scanf("%d",&nObstacleNum);
+	}
 	srand((unsigned)time(NULL));
 	int total_vertex=nRange*nRange;
 	for(int i=0;i<nObstacleNum;i++){

@@ -22,37 +22,34 @@ bool initIsTrue=true;
 void init(void){
 	
 	axis=(double)nRange/2;
-	GLfloat mat_specular[]={1.0,1.0,1.0,1.0};
-	GLfloat mat_shininess[]={50.0};
-	GLfloat light_position []={1.0,1.0,1.0,0.0};
-	GLfloat white_light[]={1.0,1.0,1.0,1.0};
-	GLfloat lmodel_ambient []={0.1,0.1,0.1,1.0};
+	GLfloat mat_specular[]={1.0,1.0,1.0,1.0};//物体的镜面材料颜色
+	GLfloat mat_shininess[]={50.0};//物体的光泽度
+	GLfloat light_position []={1.0,1.0,1.0,0.0};//光源位置的坐标
+	GLfloat white_light[]={1.0,1.0,1.0,1.0};//光的散射强度
+	GLfloat lmodel_ambient []={0.1,0.1,0.1,1.0};//全局环境光的RGBA强度
 
      glClearColor(1.0,1.0,1.0,0.0);
-     glShadeModel(GL_SMOOTH);
-	 glMaterialfv(GL_FRONT,GL_SPECULAR,mat_specular);
-	 glMaterialfv(GL_FRONT,GL_SHININESS,mat_shininess);
-	 glLightfv(GL_LIGHT0,GL_POSITION,light_position);
-	 glLightfv(GL_LIGHT0,GL_DIFFUSE,white_light);
-	 glLightfv(GL_LIGHT0,GL_SPECULAR,white_light);
-	 glLightModelfv(GL_LIGHT_MODEL_AMBIENT,lmodel_ambient);
+     glShadeModel(GL_SMOOTH);//
+	 glMaterialfv(GL_FRONT,GL_SPECULAR,mat_specular);//指定物体的镜面材料颜色p.140
+	 glMaterialfv(GL_FRONT,GL_SHININESS,mat_shininess);//指定物体的光泽度
+	 glLightfv(GL_LIGHT0,GL_POSITION,light_position);//指定光源位置的坐标
+	 glLightfv(GL_LIGHT0,GL_DIFFUSE,white_light);//指定光的散射强度
+	 glLightfv(GL_LIGHT0,GL_SPECULAR,white_light);//指定光的镜面强度
+	 glLightModelfv(GL_LIGHT_MODEL_AMBIENT,lmodel_ambient);//指定全局环境光的强度
 	 
 	 glColorMaterial(GL_FRONT,GL_DIFFUSE); //允许材质颜色
 	 glEnable(GL_COLOR_MATERIAL); 
 
-	 glEnable(GL_LIGHTING);
-	 glEnable(GL_LIGHT0);
+	 glEnable(GL_LIGHTING);//启用光照p.140
+	 glEnable(GL_LIGHT0);//启用光源
 	 glEnable(GL_DEPTH_TEST);
 	 
 	 
 }
 
 void display(){
-		 double tempx,tempy;
-		tempx=(double)xy[nStartPoint].x;
-	  tempy=(double)xy[nStartPoint].y;
      glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	 glPushMatrix();
+	 glPushMatrix();     //视图变换  p.81
 	 //坐标系绕x轴旋转xRotAngle  
     glRotatef(xRotAngle,1.0f,0.0f,0.0f);    
 	//坐标系绕y轴旋转yRotAngle  
@@ -64,7 +61,6 @@ void display(){
     glHint(GL_LINE_SMOOTH,GL_NICEST);  
     glEnable(GL_POLYGON_SMOOTH); 
     glHint(GL_POLYGON_SMOOTH,GL_NICEST); 
-
 	//白色绘制坐标系  
     glColor3f(0.0f,0.0f,1.0f);  
     glBegin(GL_LINES);  
@@ -77,20 +73,19 @@ void display(){
         glVertex3f(0.0f,0.0f,axis);  
 		 glEnable(GL_COLOR_MATERIAL); 
     glEnd();  
-
-
-
-
+			 double tempx,tempy;
+		tempx=(double)xy[nStartPoint].x;
+	  tempy=(double)xy[nStartPoint].y;
      glPushMatrix();
-	 if(initIsTrue){
-		 glTranslatef(xspin,yspin,zspin);
+	 if(initIsTrue){ 
+		 glTranslatef(tempx-axis,tempx-axis,zspin);//视图和模型变换函数  p.84  p.87
 		initIsTrue=false;}
 	 else;
 	 glTranslatef(xspin-(double)xy[nStartPoint].x,yspin-(double)xy[nStartPoint].y,0);
     
 	 glColor3f(0.0,1.0,1.0);		
 	 glTranslatef(tempx-axis,tempy-axis,zspin);
-	 glutSolidSphere(R,strip,strip);
+	 glutSolidSphere(R,strip,strip);//绘制实心球
      glPopMatrix();
 
 	  glColor3f(1.0,0.0,1.0);
@@ -104,6 +99,18 @@ void display(){
 		 glPopMatrix();
 		 //-------------------
 	 }
+	   glColor3f(0.0,1.0,0.0);//绘制行进路线
+	  	  for(int i=0;i<nPathNum;i++){
+		double ob_x=xy[ nPath[i]].x;
+		double ob_y=xy[ nPath[i]].y;
+		//-----------------
+		   glPushMatrix();
+		  glTranslatef(ob_x-axis,ob_y-axis,zspin);
+		 glutSolidSphere(R*0.5,strip,strip);
+		 glPopMatrix();
+		 //-------------------
+	 }
+
 
 
 	  glColor3f(0.0,1.0,0.0);
@@ -131,11 +138,11 @@ void moveDisplay(void){
 		double xtemp,ytemp;
 		//printf("请输入移动的坐标\n");
 	//	scanf("%lf %lf",&xtemp,&ytemp);
-		xtemp=(double)xy[nPath[ithpath]].x;
-		ytemp=(double)xy[nPath[ithpath++]].y;
+		xspin=(double)xy[nPath[ithpath]].x;
+		yspin=(double)xy[nPath[ithpath++]].y;
 
-		xspin=xtemp;
-		yspin=ytemp;
+		//xspin=xtemp;
+		//yspin=ytemp;
 /*	xspin+=(xtemp-dLastX);
     yspin+=(ytemp-dLastY);
 	dLastX = xtemp;
@@ -209,22 +216,30 @@ void specialKey(int key,int x,int y){//按键输入处理函数
 {
 	printf("请输入地图规模n 规模为n*n:\n");
 	scanf("%d",&nRange);
-	//nRange=10;
-	printf("请输入起点和终点编号:\n");
+	while(nRange<2){
+			printf("错误！\n请重新输入地图规模n 规模为n*n:\n");
+	scanf("%d",&nRange);
+	}
+	int max=nRange*nRange-1;
+	printf("请输入起点和终点编号 范围为0~%d:\n",max);
 	scanf("%d %d",&nStartPoint,&nEndPoint);
-	//nStartPoint=0;
-	//nEndPoint=99;
+	while(nStartPoint<0||nStartPoint>max||nEndPoint<0||nEndPoint>max||nStartPoint==nEndPoint){
+	printf("输入格式不正确，请重新输入编号 范围0~%d:\n",max);
+	scanf("%d %d",&nStartPoint,&nEndPoint);
+	}
 	fill(G[0],G[0]+MAXV*MAXV,INF);
 	init(nRange);	
 	Obstacle(nRange,nStartPoint,nEndPoint);
 	Dikstra(nStartPoint,nRange*nRange);
+	if(flag==false){
+		system("pause");
+		return 0;}
 	DFS(nStartPoint,nEndPoint);
-	for(int i=0;i<nPathNum;i++)
-		printf("%d\n",nPath[i]);
+		printf("最短路径长度为%.3lf\n",d[nEndPoint]);
 
 	//--------------
      glutInit(&argc,argv);
-     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
+     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);//双缓冲，
      glutInitWindowSize(700,700);
      glutInitWindowPosition(100,100);
      glutCreateWindow(argv[0]);
@@ -235,6 +250,6 @@ void specialKey(int key,int x,int y){//按键输入处理函数
 	 glutSpecialFunc(specialKey);  //按键输入处理回调函数
 
      glutMainLoop();
-
+	 system("pause");
      return 0;
 }
