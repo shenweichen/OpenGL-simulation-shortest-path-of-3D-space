@@ -5,8 +5,8 @@
 #include<algorithm>
 #include "shortpath.h"
 using namespace std;
-static GLfloat xspin = 0.0;
-static GLfloat yspin = 0.0;
+static GLfloat xspin = 0.0f;
+static GLfloat yspin = 0.0f;
 static GLfloat zspin = 0.0f;
 static GLfloat axis = 5.0f;//坐标轴半长度
 const GLfloat R = 0.5;  
@@ -62,7 +62,7 @@ void display(){
     glEnable(GL_POLYGON_SMOOTH); 
     glHint(GL_POLYGON_SMOOTH,GL_NICEST); 
 	//白色绘制坐标系  
-    glColor3f(0.0f,0.0f,1.0f);  
+    glColor3f(0.0f,0.0f,1.0f);  //起始位置
     glBegin(GL_LINES);  
 		glDisable(GL_COLOR_MATERIAL); 
         glVertex3f(-axis,0.0f,0.0f);  
@@ -71,20 +71,17 @@ void display(){
         glVertex3f(0.0f,axis,0.0f);  
         glVertex3f(0.0f,0.0f,-axis);  
         glVertex3f(0.0f,0.0f,axis);  
-		 glEnable(GL_COLOR_MATERIAL); 
+		glEnable(GL_COLOR_MATERIAL); 
     glEnd();  
-			 double tempx,tempy;
-		tempx=(double)xy[nStartPoint].x;
-	  tempy=(double)xy[nStartPoint].y;
+
      glPushMatrix();
-	 if(initIsTrue){ 
-		 glTranslatef(tempx-axis,tempx-axis,zspin);//视图和模型变换函数  p.84  p.87
-		initIsTrue=false;}
-	 else;
-	 glTranslatef(xspin-(double)xy[nStartPoint].x,yspin-(double)xy[nStartPoint].y,0);
-    
-	 glColor3f(0.0,1.0,1.0);		
-	 glTranslatef(tempx-axis,tempy-axis,zspin);
+	if(initIsTrue){
+		xspin=(double)xy[nStartPoint].x;
+		yspin=(double)xy[nStartPoint].y;
+		initIsTrue=false;
+	}
+	 glColor3f(0.0,1.0,1.0);//绘制机器人所在位置
+	 glTranslatef(xspin-axis,yspin-axis,zspin);//视图和模型变换函数  p.84  p.87
 	 glutSolidSphere(R,strip,strip);//绘制实心球
      glPopMatrix();
 
@@ -99,7 +96,7 @@ void display(){
 		 glPopMatrix();
 		 //-------------------
 	 }
-	   glColor3f(0.0,1.0,0.0);//绘制行进路线
+	  glColor3f(1.0,1.0,0.0);//绘制行进路线
 	  	  for(int i=0;i<nPathNum;i++){
 		double ob_x=xy[ nPath[i]].x;
 		double ob_y=xy[ nPath[i]].y;
@@ -114,12 +111,11 @@ void display(){
 
 
 	  glColor3f(0.0,1.0,0.0);
-	  tempx=(double)xy[nEndPoint].x;
-	  tempy=(double)xy[nEndPoint].y;
+
 	  //glRectf(tempx-0.3,tempy-0.3,tempx+0.3,tempy+0.3);
 	     glPushMatrix();
 		
-		  glTranslatef(tempx-axis,tempy-axis,zspin);
+		  glTranslatef((double)xy[nEndPoint].x-axis,(double)xy[nEndPoint].y-axis,zspin);
 		 glutSolidSphere(R,strip,strip);
 		 glPopMatrix();
 
@@ -135,19 +131,8 @@ void display(){
 
 
 void moveDisplay(void){
-		double xtemp,ytemp;
-		//printf("请输入移动的坐标\n");
-	//	scanf("%lf %lf",&xtemp,&ytemp);
 		xspin=(double)xy[nPath[ithpath]].x;
 		yspin=(double)xy[nPath[ithpath++]].y;
-
-		//xspin=xtemp;
-		//yspin=ytemp;
-/*	xspin+=(xtemp-dLastX);
-    yspin+=(ytemp-dLastY);
-	dLastX = xtemp;
-	dLastY = ytemp;*/
-	
 	 Sleep(500);
      glutPostRedisplay();
 }

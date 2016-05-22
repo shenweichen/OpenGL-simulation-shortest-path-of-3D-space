@@ -127,7 +127,7 @@ void DFS(int s,int v){
 void Obstacle(int nRange,int s,int end){
 
 	
-	printf("请输入障碍物数量0~%d:\n",nRange*nRange);
+	printf("请输入障碍物数量0~%d，建议少于%d:\n",nRange*nRange,nRange*nRange/2);
 	scanf("%d",&nObstacleNum);
 	while(nObstacleNum>=nRange*nRange||nObstacleNum<0){
 	printf("错误请重新输入障碍物数量0~%d:\n",nRange*nRange);
