@@ -11,6 +11,7 @@ static GLfloat zspin = 0.0f;
 static GLfloat axis = 5.0f;//坐标轴半长度
 const GLfloat R = 0.5;  
 const GLfloat Pi = 3.1415926536f;  
+const GLfloat curSizeLine=R;//线宽度
 int strip = 10;
 GLfloat xRotAngle=0.0f;  //绕x轴旋转角度  
 GLfloat yRotAngle=0.0f;  //绕x轴旋转角度
@@ -61,6 +62,7 @@ void display(){
     glHint(GL_LINE_SMOOTH,GL_NICEST);  
     glEnable(GL_POLYGON_SMOOTH); 
     glHint(GL_POLYGON_SMOOTH,GL_NICEST); 
+	/*
 	//白色绘制坐标系  
     glColor3f(0.0f,0.0f,1.0f);  //起始位置
     glBegin(GL_LINES);  
@@ -73,7 +75,7 @@ void display(){
         glVertex3f(0.0f,0.0f,axis);  
 		glEnable(GL_COLOR_MATERIAL); 
     glEnd();  
-
+	*/
      glPushMatrix();
 	if(initIsTrue){
 		xspin=(double)xy[nStartPoint].x;
@@ -82,28 +84,48 @@ void display(){
 	}
 	 glColor3f(0.0,1.0,1.0);//绘制机器人所在位置
 	 glTranslatef(xspin-axis,yspin-axis,zspin);//视图和模型变换函数  p.84  p.87
-	 glutSolidSphere(R,strip,strip);//绘制实心球
+	 glutSolidSphere(R*0.9,strip,strip);//绘制实心球
+	  //glutSolidCube(R);//绘制正方体
      glPopMatrix();
 
 	  glColor3f(1.0,0.0,1.0);
-	  for(int i=0;i<nObstacleNum;i++){
+	  for(int i=0;i<nObstacleNum;i++){//绘制障碍物
 		double ob_x=xy[nObstacleID[i]].x;
 		double ob_y=xy[nObstacleID[i]].y;			
 		//-----------------
-		   glPushMatrix();
-		  glTranslatef(ob_x-axis,ob_y-axis,zspin);
+		 glPushMatrix();
+		 glTranslatef(ob_x-axis,ob_y-axis,zspin);
 		 glutSolidSphere(R,strip,strip);
+	//   glutSolidCube(R);
 		 glPopMatrix();
 		 //-------------------
 	 }
+
+	  double last_ob_x=xy[nStartPoint].x;
+	  double last_ob_y=xy[nStartPoint].y;
 	  glColor3f(1.0,1.0,0.0);//绘制行进路线
 	  	  for(int i=0;i<nPathNum;i++){
 		double ob_x=xy[ nPath[i]].x;
 		double ob_y=xy[ nPath[i]].y;
 		//-----------------
 		   glPushMatrix();
-		  glTranslatef(ob_x-axis,ob_y-axis,zspin);
-		 glutSolidSphere(R*0.5,strip,strip);
+		//添加直线-------
+	
+		glLineWidth(curSizeLine); 
+		glBegin(GL_LINE_STRIP);
+		    //进行平滑处理　  
+		glEnable(GL_LINE_SMOOTH); 
+		glHint(GL_LINE_SMOOTH,GL_NICEST);  
+		 glColor3f(1.0,1.0,0.0);//绘制行进路线
+		glVertex3f(ob_x-axis,ob_y-axis,0.0f);
+		glVertex3f(last_ob_x-axis,last_ob_y-axis,0.0f); 
+		last_ob_x=ob_x;
+		last_ob_y=ob_y;
+		glDisable(GL_LINE_SMOOTH); 
+		glEnd();
+		 //---------------
+		//  glTranslatef(ob_x-axis,ob_y-axis,zspin);
+		// glutSolidSphere(R*0.5,strip,strip);
 		 glPopMatrix();
 		 //-------------------
 	 }
@@ -114,7 +136,6 @@ void display(){
 
 	  //glRectf(tempx-0.3,tempy-0.3,tempx+0.3,tempy+0.3);
 	     glPushMatrix();
-		
 		  glTranslatef((double)xy[nEndPoint].x-axis,(double)xy[nEndPoint].y-axis,zspin);
 		 glutSolidSphere(R,strip,strip);
 		 glPopMatrix();
