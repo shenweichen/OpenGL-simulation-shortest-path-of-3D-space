@@ -10,12 +10,12 @@ int nPath[MAXEDGE],nPathNum=0,nObstacleNum=0;
 COORDINATE xy[MAXV];
 int nObstacleID[1000];
 
-int Hash(int x,int y,int range){//获得指定坐标的顶点编号
+int Hash(int x,int y,int range){//获得指定坐标(x,y)的顶点编号
 	return x*range+y;
 }
 
 
-void init(int nRange){
+void init(int nRange){//初始化网格地图为一个米字型的完全连通图
 		int num=0;
 	for(int i=0;i<nRange;i++){//初始化指定编号的点的坐标
 		for(int j=0;j<nRange;j++,num++){
@@ -87,7 +87,7 @@ void init(int nRange){
 	}
 }
 
-void Dikstra(int s,int nVertexNum){
+void Dikstra(int s,int nVertexNum){//迪杰斯特拉算法求点s到各个顶点的最短路径
 	fill(d,d+MAXV,INF);
 	for(int i=0;i<MAXEDGE;i++)
 		pre[i]=i;
@@ -124,7 +124,7 @@ void DFS(int s,int v){
 	nPath[nPathNum++]=v;
 }
 
-void Obstacle(int nRange,int s,int end){
+void Obstacle(int nRange,int s,int end){//设置障碍物
 
 	
 	printf("请输入障碍物数量0~%d，建议少于%d:\n",nRange*nRange,nRange*nRange/2);
